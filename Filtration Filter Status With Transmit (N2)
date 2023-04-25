@@ -1,0 +1,58 @@
+# Discount GreenHouse Filtration
+# Nitrogen
+alias Led d0
+move r5 0
+start:
+#check filter health
+ls r0 db 0 Quantity
+ls r1 db 1 Quantity
+add r0 r0 r1
+div r0 r0 50
+floor r0 r0
+beq r0 0 red
+beq r0 1 orange
+beq r0 2 yellow
+beq r0 3 green
+beq r0 4 white
+move r5 10 #set light pink
+setcolor:
+s d0 Color r5 #led
+ble r0 2 alarm
+#filter on?
+lb r3 -1252983604 Pressure 0 #gas Sensor
+lb r4 -1252983604 RatioNitrogen 0
+sgt r3 r3 110
+sgt r4 r4 0.7
+and r3 r3 r4
+s db Mode r3
+s d0 On r3
+j hop
+skip:
+s db Mode 0
+s d0 On 0
+hop:
+end:
+yield
+j start
+#audio suit alarm
+alarm:
+add r6 r0 1
+sb -1326019434 ForceWrite 1 #logicWriter
+sleep r6
+sb -1326019434 ForceWrite 0 #logicWriter
+j end
+red:
+move r5 4
+j setcolor
+orange:
+move r5 3
+j setcolor
+yellow:
+move r5 5
+j setcolor
+green:
+move r5 2
+j setcolor
+white:
+move r5 6
+j setcolor
