@@ -1,0 +1,56 @@
+# Discount GreenHouse Filtration
+# Vol. & Pollutants
+alias Led d0
+move r5 0
+start:
+#check filter health
+ls r0 db 0 Quantity
+ls r1 db 1 Quantity
+div r0 r0 25
+div r1 r1 25
+floor r0 r0
+floor r1 r1
+min r3 r0 r1
+beq r3 0 red
+beq r3 1 orange
+beq r3 2 yellow
+beq r3 3 green
+beq r3 4 white
+move r4 10
+setcolor:
+s d0 Color r4 #led
+ble r3 2 alarm
+#filter on?
+lb r4 -1252983604 RatioVolatiles 0
+sgt r4 r4 0.000001
+lb r5 -1252983604 RatioPollutant 0
+sgt r5 r5 0.000001
+or r6 r4 r5
+s db Mode r6
+s d0 On r6
+end:
+yield
+j start
+#audio suit alarm
+alarm:
+add r6 r0 1
+sb -1326019434 ForceWrite 1 #logicWriter
+sleep r6
+sb -1326019434 ForceWrite 0 #logicWriter
+j end
+
+red:
+move r4 4
+j setcolor
+orange:
+move r4 3
+j setcolor
+yellow:
+move r4 5
+j setcolor
+green:
+move r4 2
+j setcolor
+white:
+move r4 6
+j setcolor
