@@ -1,0 +1,76 @@
+# Discount GreenHouse Filtration
+# Oxygen
+move r5 0
+start:
+#check filter health
+ls r0 db 0 Quantity
+ls r1 db 1 Quantity
+add r0 r0 r1
+div r0 r0 50
+floor r0 r0
+beq r0 0 red
+beq r0 1 orange
+beq r0 2 yellow
+beq r0 3 green
+beq r0 4 white
+move r5 10 #set light pink
+setcolor:
+s d0 Color r5 #led
+ble r0 2 alarm
+#filter on?
+areturn:
+lb r3 -1252983604 Pressure 0 #gas Sensor
+lb r4 -1252983604 RatioOxygen 0
+sgt r3 r3 110
+sgt r4 r4 0.90
+or r3 r3 r4
+s db Mode r3 # filter
+s d0 On r3 #led
+j hop
+s db Mode 0
+s d0 On 0
+hop:
+#light
+lb r8 1076425094 SolarAngle 0 #daylight sensor
+sgt r8 r8 90
+sb -1758710260 On r8 #Grow Lights
+#heat
+lb r7 -1252983604 Temperature 0
+blt r7 303.15 heat #273.15 0 Kelvin
+sb 24258244 On 0 #Turn Heaters off
+heat:
+bgt r7 293.15 here
+sb 24258244 On 1 #Turn Heaters on
+here:
+#water temp check
+lb r9 1691898022 Temperature 3
+blt r9 303.15 wheat #273.15 0 Kelvin
+sb -287495560 On 0 #Turn Water Heaters off
+wheat:
+bgt r9 293.15 end
+sb -287495560 On 1 #Turn Water Heaters on
+end:
+yield
+j start
+#audio suit alarm
+alarm:
+add r6 r0 1
+sb -1326019434 ForceWrite 1 #logicWriter
+sleep r6
+sb -1326019434 ForceWrite 0 #logicWriter
+j areturn
+red:
+move r5 4
+j setcolor
+orange:
+move r5 3
+j setcolor
+yellow:
+move r5 5
+j setcolor
+green:
+move r5 2
+j setcolor
+white:
+move r5 6
+j setcolor
